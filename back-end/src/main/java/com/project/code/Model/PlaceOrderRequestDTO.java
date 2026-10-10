@@ -22,7 +22,7 @@ public class PlaceOrderRequestDTO {
     private List<@Valid PurchaseProductDTO> purchaseProduct;
     private Double totalPrice;
 
-    // Getters and Setters
+
 
     public Long getStoreId() {
         return storeId;

@@ -90,10 +90,10 @@ public class OrderService {
         orderDetailsRepository.save(orderDetails);
 
     }
-// 1. **saveOrder Method**:
-//    - Processes a customer's order, including saving the order details and associated items.
-//    - Parameters: `PlaceOrderRequestDTO placeOrderRequest` (Request data for placing an order)
-//    - Return Type: `void` (This method doesn't return anything, it just processes the order)
+
+
+
+
     public Customer getCustomer(PlaceOrderRequestDTO placeOrderRequestDTO){
         if (placeOrderRequestDTO.getCustomerName() == null || placeOrderRequestDTO.getCustomerName().isBlank()
                 || placeOrderRequestDTO.getCustomerEmail() == null || placeOrderRequestDTO.getCustomerEmail().isBlank()
@@ -110,33 +110,33 @@ public class OrderService {
         customer.setPhone(placeOrderRequestDTO.getCustomerPhone());
         return customerRepository.save(customer);
     }
-// 2. **Retrieve or Create the Customer**:
-//    - Check if the customer exists by their email using `findByEmail`.
-//    - If the customer exists, use the existing customer; otherwise, create and save a new customer using `customerRepository.save()`.
+
+
+
 
     public Store validateStoreId(long id) throws ResponseStatusException {
         return storeRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Store not found"));
     }
-// 3. **Retrieve the Store**:
-//    - Fetch the store by ID from `storeRepository`.
-//    - If the store doesn't exist, throw an exception. Use `storeRepository.findById()`.
+
+
+
 
     public OrderDetails saveOrderDetails(Customer customer, Store store, Double totalPrice) {
         return new OrderDetails(customer, store, totalPrice, LocalDateTime.now());
     }
-// 4. **Create OrderDetails**:
-//    - Create a new `OrderDetails` object and set customer, store, total price, and the current timestamp.
-//    - Set the order date using `java.time.LocalDateTime.now()` and save the order with `orderDetailsRepository.save()`.
+
+
+
 
     public OrderItem saveOrderItem(PurchaseProductDTO purchaseProductDTO,OrderDetails orderDetails,Long storeId) {
         Product product = productRepository.findById(purchaseProductDTO.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
         return new OrderItem(orderDetails, product, purchaseProductDTO.getQuantity(), product.getPrice());
     }
-// 5. **Create and Save OrderItems**:
-//    - For each product purchased, find the corresponding inventory, update stock levels, and save the changes using `inventoryRepository.save()`.
-//    - Create and save `OrderItem` for each product and associate it with the `OrderDetails` using `orderItemRepository.save()`.
 
-   
+
+
+
+
 }
