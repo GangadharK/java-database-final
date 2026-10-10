@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
-@Table(name = "product",
+@Table(name = "products",
         uniqueConstraints = {
                 @UniqueConstraint(name = "product_sku", columnNames = {"sku"})
         })
