@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @RestController
@@ -122,6 +123,28 @@ public class InventoryController {
         }
         return Map.of("product",productNames);
     }
+
+    @GetMapping("/filter/{category}/{name}/{storeId}")
+    public Map<String, Object> filterProductsForStore(@PathVariable String category,
+                                                       @PathVariable String name,
+                                                       @PathVariable Long storeId) {
+        boolean allCategories = "null".equalsIgnoreCase(category);
+        boolean allNames = "null".equalsIgnoreCase(name);
+        List<Product> products;
+        if (allCategories) {
+            products = inventoryRepository.findByStore_Id(storeId).stream()
+                    .map(Inventory::getProduct)
+                    .distinct()
+                    .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        } else {
+            products = new ArrayList<>(productRepository.findByStoreIdAndCategory(storeId, category));
+        }
+        if (!allNames) {
+            products.removeIf(product -> product.getName() == null
+                    || !product.getName().toLowerCase(Locale.ROOT).contains(name.toLowerCase(Locale.ROOT)));
+        }
+        return Map.of("products", products);
+    }
 // 6. Define the `getProductName` Method:
 //    - This method handles HTTP GET requests to filter products by category and name.
 //    - If either the category or name is `"null"`, adjust the filtering logic accordingly.
@@ -157,6 +180,16 @@ public class InventoryController {
         return quantity != null && quantity > 0
                 && inventoryRepository.findByProduct_IdAndStore_Id(productId,storeId)
                 .filter(inventory -> inventory.getStockLevel()>=quantity)
+                .isPresent();
+    }
+
+    @GetMapping("/validate/{quantity}/{storeId}/{productId}")
+    public Boolean validateAvailableQuantity(@PathVariable Integer quantity,
+                                             @PathVariable Long storeId,
+                                             @PathVariable Long productId) {
+        return quantity != null && quantity > 0
+                && inventoryRepository.findByProduct_IdAndStore_Id(productId, storeId)
+                .filter(inventory -> inventory.getStockLevel() >= quantity)
                 .isPresent();
     }
 // 9. Define the `validateQuantity` Method:

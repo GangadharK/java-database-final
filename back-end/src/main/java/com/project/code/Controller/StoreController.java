@@ -12,7 +12,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/store")
 public class StoreController {
     private final OrderService orderService;
     private final StoreRepository storeRepository;
@@ -32,7 +31,7 @@ public class StoreController {
 //        - `OrderService` for handling order-related functionality.
 
 
-    @PostMapping
+    @PostMapping({"/store", "/store/"})
     public Map<String,String> addStore(@Valid @RequestBody Store store) {
         storeRepository.save(store);
         return Map.of("message","Store added successfully");
@@ -43,7 +42,11 @@ public class StoreController {
 //    - Return a success message in a `Map<String, String>` with the key `message` containing store creation confirmation.
 
 
-    @GetMapping("validate/{storeId}")
+    @GetMapping({
+            "/store/validate/{storeId}",
+            "/validate/store/{storeId}",
+            "/store/validate/store/{storeId}"
+    })
     public Boolean validateStore(@PathVariable("storeId") Long storeId) {
         return storeRepository.existsById(storeId);
     }
@@ -52,7 +55,7 @@ public class StoreController {
 //    - Return a **boolean** indicating if the store exists.
 
 
-    @PostMapping("/placeOrder")
+    @PostMapping("/store/placeOrder")
     public ResponseEntity<Map<String,String>> placeOrder(@Valid @RequestBody PlaceOrderRequestDTO placeOrderRequestDTO) {
         try{
             orderService.saveOrder(placeOrderRequestDTO);
