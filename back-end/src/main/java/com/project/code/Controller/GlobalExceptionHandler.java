@@ -16,17 +16,4 @@ public class GlobalExceptionHandler {
     public Map<String, Object> handleJsonParseException(HttpMessageNotReadableException ex) {
         return Map.of("message", "Invalid input: The data provided is not valid.");
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

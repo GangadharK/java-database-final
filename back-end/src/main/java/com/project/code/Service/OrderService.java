@@ -3,6 +3,7 @@ package com.project.code.Service;
 import com.project.code.Model.*;
 import com.project.code.Repo.*;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,23 +17,20 @@ import java.util.Map;
 
 @Service
 public class OrderService {
-    private final ProductRepository productRepository;
-    private final CustomerRepository customerRepository;
-    private final StoreRepository storeRepository;
-    private final InventoryRepository inventoryRepository;
-    private final OrderItemRepository orderItemRepository;
-    private final OrderDetailsRepository orderDetailsRepository;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
+    @Autowired
+    private StoreRepository storeRepository;
+    @Autowired
+    private InventoryRepository inventoryRepository;
+    @Autowired
+    private OrderItemRepository orderItemRepository;
+    @Autowired
+    private OrderDetailsRepository orderDetailsRepository;
 
-    public OrderService(ProductRepository productRepository, CustomerRepository customerRepository,
-                        StoreRepository storeRepository, InventoryRepository inventoryRepository,
-                        OrderItemRepository orderItemRepository, OrderDetailsRepository orderDetailsRepository) {
-        this.productRepository = productRepository;
-        this.customerRepository = customerRepository;
-        this.storeRepository = storeRepository;
-        this.inventoryRepository = inventoryRepository;
-        this.orderItemRepository = orderItemRepository;
-        this.orderDetailsRepository = orderDetailsRepository;
-    }
+
     @Transactional
     public void saveOrder(PlaceOrderRequestDTO placeOrderRequestDTO) throws ResponseStatusException {
         if (placeOrderRequestDTO == null || placeOrderRequestDTO.getStoreId() == null

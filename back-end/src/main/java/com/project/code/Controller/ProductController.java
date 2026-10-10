@@ -1,5 +1,4 @@
 package com.project.code.Controller;
-
 import com.project.code.Model.Product;
 import com.project.code.Repo.InventoryRepository;
 import com.project.code.Repo.ProductRepository;
@@ -8,13 +7,11 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/product")
 public class ProductController {
     @Autowired
     ProductRepository productRepository;
@@ -22,24 +19,12 @@ public class ProductController {
     ServiceClass serviceClass;
     @Autowired
     InventoryRepository inventoryRepository;
-
-
-
-
-
-
-
-
-
-
-
-
-    @PostMapping
+    @PostMapping("/product")
     public Map<String,String> addProduct(@Valid @RequestBody Product product) {
         try{
             if(serviceClass.validateProduct(product)) {
-                 productRepository.save(product);
-                 return Map.of("message","Product successfully added");
+                productRepository.save(product);
+                return Map.of("message","Product successfully added");
             }
         }
         catch (DataIntegrityViolationException e) {
@@ -47,26 +32,13 @@ public class ProductController {
         }
         return Map.of("message", "Product already exists");
     }
-
-
-
-
-
-
-
-    @GetMapping("/{id}")
+    @GetMapping("/product/{id}")
     public Map<String,Object> getProductbyId(@PathVariable Long id) {
         Optional<Product> products=productRepository.findById(id);
         return products.<Map<String, Object>>map(product -> Map.of("products", product))
                 .orElseGet(() -> Map.of("message", "Product not found"));
     }
-
-
-
-
-
-
-    @PutMapping
+    @PutMapping("/product")
     public Map<String,Object> updateProduct(@Valid @RequestBody Product product) {
         try{
             if(product.getId() != null && serviceClass.validateProductId(product.getId())) {
@@ -86,15 +58,8 @@ public class ProductController {
         }catch (DataIntegrityViolationException e) {
             return Map.of("message", "Product Not updated please try again");
         }
-
     }
-
-
-
-
-
-
-    @GetMapping("/category/{name}/{category}")
+    @GetMapping("/product/{name}/category/{category}")
     public Map<String,Object> filterbyCategoryProduct(@PathVariable String name, @PathVariable String category) {
         List<Product> products;
         boolean allNames = "null".equalsIgnoreCase(name);
@@ -110,21 +75,10 @@ public class ProductController {
         }
         return Map.of("products",products);
     }
-
-
-
-
-
-
-    @GetMapping
+    @GetMapping("/product")
     public Map<String,Object> listProduct() {
         return Map.of("products",productRepository.findAll());
     }
-
-
-
-
-
     @GetMapping("filter/{category}/{storeid}")
     public Map<String,Object> getProductbyCategoryAndStoreId(@PathVariable String category, @PathVariable Long storeid) {
         List<Product> products;
@@ -133,12 +87,7 @@ public class ProductController {
                 .findByProduct_IdAndStore_Id(product.getId(),storeid).isEmpty());
         return Map.of("product",products);
     }
-
-
-
-
-
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/product/{id}")
     public Map<String,Object> deleteProduct(@PathVariable Long id) {
         if(serviceClass.validateProductId(id)){
             inventoryRepository.deleteByProduct_Id(id);
@@ -147,23 +96,8 @@ public class ProductController {
         }
         return Map.of("message","Product not found");
     }
-
-
-
-
-
-
-
-    @GetMapping("/searchProduct/{name}")
+    @GetMapping("/product/{name}")
     public Map<String,Object> searchProduct(@PathVariable String name){
         return Map.of("products",productRepository.findByNameLike("%" + name + "%"));
     }
-
-
-
-
-
-
-
-
 }

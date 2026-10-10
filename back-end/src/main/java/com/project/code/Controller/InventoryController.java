@@ -1,5 +1,4 @@
 package com.project.code.Controller;
-
 import com.project.code.Model.CombinedRequest;
 import com.project.code.Model.Inventory;
 import com.project.code.Model.Product;
@@ -19,7 +18,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/inventory")
 public class InventoryController {
-
     ProductRepository productRepository;
     InventoryRepository inventoryRepository;
     StoreRepository storeRepository;
@@ -34,17 +32,6 @@ public class InventoryController {
         this.storeRepository = storeRepository;
         this.serviceClass = serviceClass;
     }
-
-
-
-
-
-
-
-
-
-
-
     @PutMapping
     public Map<String,Object> updateInventory(@RequestBody CombinedRequest combinedRequest){
         if (combinedRequest == null || combinedRequest.getProduct() == null
@@ -70,12 +57,6 @@ public class InventoryController {
         inventoryRepository.save(existingInventory);
         return Map.of("inventory", "Inventory updated successfully");
     }
-
-
-
-
-
-
     @PostMapping
     public Map<String,Object> saveInventory(@Valid @RequestBody Inventory inventory){
         if(serviceClass.validateInventory(inventory)) {
@@ -84,11 +65,6 @@ public class InventoryController {
         }
         return Map.of("error","Inventory is invalid or already exists");
     }
-
-
-
-
-
     @GetMapping("/store/{storeid}")
     public Map<String,Object> getAllProducts(@PathVariable("storeid") Long storeid){
         List<Inventory> inventory=inventoryRepository.findByStore_Id(storeid);
@@ -98,11 +74,6 @@ public class InventoryController {
         }
         return Map.of("products",products);
     }
-
-
-
-
-
     @GetMapping("/category/{category}/product/{productName}")
     public Map<String,Object> getProductName(@PathVariable  String category,@PathVariable String productName){
         List<String> productNames=new ArrayList<>();
@@ -123,7 +94,6 @@ public class InventoryController {
         }
         return Map.of("product",productNames);
     }
-
     @GetMapping("/filter/{category}/{name}/{storeId}")
     public Map<String, Object> filterProductsForStore(@PathVariable String category,
                                                        @PathVariable String name,
@@ -145,46 +115,23 @@ public class InventoryController {
         }
         return Map.of("products", products);
     }
-
-
-
-
-
-    @GetMapping("/name/{productName}/storeId/{storeId}")
-    public Map<String,Object> searchProducts(@PathVariable String productName,@PathVariable Long storeId){
+    @GetMapping("/{name}/{storeId}")
+    public Map<String,Object> searchProducts(@PathVariable("name") String productName,@PathVariable Long storeId){
         List<Product> products= productRepository.findByNameLike("%" + productName + "%");
         products.removeIf(product -> inventoryRepository.findByProduct_IdAndStore_Id(product.getId(), storeId).isEmpty());
         return Map.of("product",products);
     }
-
-
-
-
-
-    @DeleteMapping("/productId/{productID}")
+    @DeleteMapping("/{productID}")
     public Map<String,Object> deleteProduct(@PathVariable Long productID){
-        if(serviceClass.validateProductId(productID)){
+        if(Boolean.TRUE.equals(serviceClass.validateProductId(productID))){
             inventoryRepository.deleteByProduct_Id(productID);
             productRepository.deleteById(productID);
             return Map.of("message","product deleted successfully");
         }
         return Map.of("message","product not found");
     }
-
-
-
-
-
-    @GetMapping("/productId/{productId}/storeid/{storeId}/quantity/{quantity}")
-    public Boolean validateQuantity(@PathVariable Long productId,@PathVariable Long storeId,@PathVariable Integer quantity){
-        return quantity != null && quantity > 0
-                && inventoryRepository.findByProduct_IdAndStore_Id(productId,storeId)
-                .filter(inventory -> inventory.getStockLevel()>=quantity)
-                .isPresent();
-    }
-
     @GetMapping("/validate/{quantity}/{storeId}/{productId}")
-    public Boolean validateAvailableQuantity(@PathVariable Integer quantity,
+    public Boolean validateQuantity(@PathVariable Integer quantity,
                                              @PathVariable Long storeId,
                                              @PathVariable Long productId) {
         return quantity != null && quantity > 0
@@ -192,9 +139,4 @@ public class InventoryController {
                 .filter(inventory -> inventory.getStockLevel() >= quantity)
                 .isPresent();
     }
-
-
-
-
-
 }

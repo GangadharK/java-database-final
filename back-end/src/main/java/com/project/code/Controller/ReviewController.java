@@ -1,5 +1,6 @@
 package com.project.code.Controller;
 
+import com.project.code.Model.Customer;
 import com.project.code.Model.Review;
 import com.project.code.Model.ReviewDTO;
 import com.project.code.Repo.CustomerRepository;
@@ -23,49 +24,24 @@ public class ReviewController {
     ReviewRepository reviewRepository;
     @Autowired
     CustomerRepository customerRepository;
-
     @GetMapping
     public Map<String, Object> getAllReviews() {
         return Map.of("reviews", reviewRepository.findAll());
     }
-
     @GetMapping("/{storeId}/{productId}")
     public Map<String,Object> getReviews(@PathVariable("storeId") Long storeId, @PathVariable("productId") Long productId){
         List<Review> reviews=reviewRepository.findByStoreIdAndProductId( storeId,productId);
-
         List<ReviewDTO> reviewDTOs=new ArrayList<>();
         for(Review review:reviews){
             String customerName = customerRepository.findById(review.getCustomerId())
-                    .map(customer -> customer.getName())
+                    .map(Customer::getName)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                             "Customer not found for review"));
             ReviewDTO reviewDTO=new ReviewDTO(customerName,
-                                review.getComment(),
-                                review.getRating()
-                                    );
+                    review.getComment(),
+                    review.getRating());
             reviewDTOs.add(reviewDTO);
         }
         return Map.of("reviews",reviewDTOs);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
