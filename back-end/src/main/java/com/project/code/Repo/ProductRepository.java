@@ -1,7 +1,22 @@
 package com.project.code.Repo;
 
 
-public interface ProductRepository {
+import com.project.code.Model.Product;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface ProductRepository extends JpaRepository<Product,Long> {
+    public List<Product> findAll();
+    public List<Product> findByCategory(String category);
+    public List<Product> findByPriceBetween(Double priceStart, Double priceEnd);
+    public List<Product> findByPriceGreaterThan(Double priceStart);
+    public List<Product> findByName(String name);
+    public List<Product> findByNameAndCategory(String name, String category);
+    public List<Product> findByNameLike(String productName);
+
 // 1. Add the repository interface:
 //    - Extend JpaRepository<Product, Long> to inherit basic CRUD functionality.
 //    - This allows the repository to perform operations like save, delete, update, and find without having to implement these methods manually.
@@ -48,6 +63,5 @@ public interface ProductRepository {
 //      - Return type: List<Product>
 //      - Parameters: Long storeId, String pname
 //      - Use @Query annotation to write a custom query.
-
 
 }

@@ -1,12 +1,53 @@
 package com.project.code.Controller;
 
+import com.project.code.Model.Review;
+import com.project.code.Model.ReviewDTO;
+import com.project.code.Repo.CustomerRepository;
+import com.project.code.Repo.ReviewRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/reviews")
 public class ReviewController {
+    @Autowired
+    ReviewRepository reviewRepository;
+    @Autowired
+    CustomerRepository customerRepository;
+
+    @GetMapping("/{storeId}/{productId}")
+    public Map<String,Object> getReviews(@PathVariable("storeId") Long storeId, @PathVariable("productId") Long productId){
+        List<Review> reviews=reviewRepository.findByStoreIdAndProductId( storeId,productId);
+
+        List<ReviewDTO> reviewDTOs=new ArrayList<>();
+        for(Review review:reviews){
+            String customerName = customerRepository.findById(review.getCustomerId())
+                    .map(customer -> customer.getName())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Customer not found for review"));
+            ReviewDTO reviewDTO=new ReviewDTO(customerName,
+                                review.getComment(),
+                                review.getRating()
+                                    );
+            reviewDTOs.add(reviewDTO);
+        }
+        return Map.of("reviews",reviewDTOs);
+    }
 // 1. Set Up the Controller Class:
 //    - Annotate the class with `@RestController` to designate it as a REST controller for handling HTTP requests.
 //    - Map the class to the `/reviews` URL using `@RequestMapping("/reviews")`.
 
 
- // 2. Autowired Dependencies:
+    // 2. Autowired Dependencies:
 //    - Inject the following dependencies via `@Autowired`:
 //        - `ReviewRepository` for accessing review data.
 //        - `CustomerRepository` for retrieving customer details associated with reviews.

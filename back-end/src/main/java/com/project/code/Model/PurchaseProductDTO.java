@@ -1,10 +1,15 @@
 package com.project.code.Model;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 public class PurchaseProductDTO {
+    @NotNull
     private Long id;
     private String name;
     private Double price;
+    @NotNull
+    @Positive
     private Integer quantity;
     private Double total;
 
